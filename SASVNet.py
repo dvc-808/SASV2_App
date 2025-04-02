@@ -163,21 +163,25 @@ class ModelTrainer(object):
             ## Read files and compute all scores
             for idx, line in enumerate(lines_eval):
                 data = line.split()
-                enr = embeds_enr[data[0]].cuda()
-                tst = embeds_tst[data[1]].cuda()
-                if self.__model__.module.__L__.test_normalize:
-                    enr = F.normalize(enr, p=2, dim=1)
-                    tst = F.normalize(tst, p=2, dim=1)
+                #!luc nay loi phat sinh tu day ra
+                try:
+                    enr = embeds_enr[data[0]].cuda()
+                    tst = embeds_tst[data[1]].cuda()
+                    if self.__model__.module.__L__.test_normalize:
+                        enr = F.normalize(enr, p=2, dim=1)
+                        tst = F.normalize(tst, p=2, dim=1)
 
-                score = F.cosine_similarity(enr, tst)
+                    score = F.cosine_similarity(enr, tst)
 
-                all_scores.append(score.detach().cpu().numpy())
-                all_labels.append(data[3])
+                    all_scores.append(score.detach().cpu().numpy())
+                    all_labels.append(data[3])
 
-                telapsed = time.time() - tstart
+                    telapsed = time.time() - tstart
 
-                sys.stdout.write("\r Computing {:d} of {:d}: {:.2f} Hz      ".format(idx, len(lines_eval), idx/telapsed))
-                sys.stdout.flush()
+                    sys.stdout.write("\r Computing {:d} of {:d}: {:.2f} Hz      ".format(idx, len(lines_eval), idx/telapsed))
+                    sys.stdout.flush()
+                except Exception as e:
+                    print(e)
 
         return (all_scores, all_labels)
 
