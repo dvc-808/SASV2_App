@@ -91,7 +91,7 @@ class ModelTrainer(object):
 
         return (loss/cnt, top1/cnt, lr)
 
-    def evaluateFromList(self, eval_list, eval_path, num_thread, eval_frames=0, num_eval=1, enroll_female_list, enroll_male_list **kwargs):
+    def evaluateFromList(self, eval_list, eval_path, num_thread, eval_frames=0, num_eval=1, enroll_female_list, enroll_male_list, **kwargs):
 
         rank = 0
         self.__model__.eval()
