@@ -51,7 +51,7 @@ class ModelTrainer(object):
         Scheduler = importlib.import_module('scheduler.'+scheduler).__getattribute__('Scheduler')
         self.__scheduler__, _ = Scheduler(self.__optimizer__, **kwargs)
 
-        self.scaler = GradScaler() 
+        self.scaler = GradScaler()
         self.gpu = 0
         self.ngpu = 1
         self.ndistfactor = int(kwargs.get('num_utt') * self.ngpu)
@@ -91,15 +91,15 @@ class ModelTrainer(object):
 
         return (loss/cnt, top1/cnt, lr)
 
-    def evaluateFromList(self, eval_list, eval_path, num_thread, eval_frames=0, num_eval=1, **kwargs):
+    def evaluateFromList(self, eval_list, eval_path, num_thread, eval_frames=0, num_eval=1, enroll_female_list, enroll_male_list **kwargs):
 
         rank = 0
         self.__model__.eval()
 
         ## Enroll (speaker model) loader ##
         spk_meta = {}
-        meta_f = np.loadtxt('protocols/ASVspoof2019.LA.asv.eval.female.trn.txt', str)
-        meta_m = np.loadtxt('protocols/ASVspoof2019.LA.asv.eval.male.trn.txt', str)
+        meta_f = np.loadtxt(enroll_male_list, str)
+        meta_m = np.loadtxt(enroll_female_list, str)
         meta = np.concatenate((meta_f, meta_m))
         for i, spk in enumerate(meta[:,0]):
             spk_meta[spk] = meta[i][1].split(',')
