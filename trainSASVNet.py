@@ -32,7 +32,7 @@ parser.add_argument('--seed',           type=int,   default=10,     help='Seed f
 
 ## Training details
 parser.add_argument('--test_interval',  type=int,   default=1,      help='Test and save every [test_interval] epochs')
-parser.add_argument('--max_epoch',      type=int,   default=100,    help='Maximum number of epochs')
+parser.add_argument('--max_epoch',      type=int,   default=1,    help='Maximum number of epochs')
 parser.add_argument('--trainfunc',      type=str,   default="aamsoftmax",     help='Loss function')
 
 ## Optimizer
@@ -116,7 +116,7 @@ def main_worker(args):
     if args.eval == True:
         print('Test list',args.eval_list)
         sc, lab = trainer.evaluateFromList(**vars(args))
-
+        
         ## Save scores
         if args.scoring == True:
             np.save(f'{args.result_save_path}/predict_scores.npy', sc)
@@ -129,8 +129,6 @@ def main_worker(args):
         with open(args.result_save_path + "/metrics", "a") as f_res:
             f_res.write(cur_time + "\n")
             f_res.write(msg)
-
-
         return
 
     ## Initialise trainer and data loader
