@@ -180,14 +180,15 @@ class train_dataset_loader(Dataset):
 
 class test_dataset_loader(Dataset):
     
-    def __init__(self, test_list, test_path, eval_frames, num_eval, label=False, **kwargs):
+    def __init__(self, test_list, infer_path, eval_frames, num_eval, label=False, **kwargs):
         self.max_frames = eval_frames
         self.num_eval = num_eval
-        self.test_path = test_path
+        self.infer_path = infer_path
         self.test_list = test_list
         self.test_label = label
         
     def __getitem__(self, index):
+        #! test_list is a list of audio FILE NAME, not included path 
         audio = loadWAV(os.path.join(self.test_path, self.test_list[index]), self.max_frames, evalmode=True, num_eval=self.num_eval)
         if self.test_label!=False: 
             return torch.FloatTensor(audio), self.test_list[index], self.test_label[index]
@@ -196,7 +197,6 @@ class test_dataset_loader(Dataset):
 
     def __len__(self):
         return len(self.test_list)
-
 
 class train_dataset_sampler(torch.utils.data.Sampler):
     

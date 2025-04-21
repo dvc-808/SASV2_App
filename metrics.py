@@ -24,6 +24,8 @@ def get_all_EERs(
     sv_preds, spf_preds = [], []
 
     for pred, key in zip(preds, keys):
+        #? Pred: cosine sim of mbeded audio and enrolled mbeded
+        #? key: target, nontarget, spoof
         if key == "target":
             sasv_labels.append(1)
             sv_labels.append(1)
@@ -45,13 +47,15 @@ def get_all_EERs(
                 f"should be one of 'target', 'nontarget', 'spoof', got:{key}"
             )
 
-    fpr, tpr, _ = roc_curve(sasv_labels, preds, pos_label=1)
+    fpr, tpr, threshold = roc_curve(sasv_labels, preds, pos_label=1)
+    #? pos_label: positive label
+    #? fpr tpr data type?
     sasv_eer = brentq(lambda x: 1.0 - x - interp1d(fpr, tpr)(x), 0.0, 1.0)
 
-    fpr, tpr, _ = roc_curve(sv_labels, sv_preds, pos_label=1)
+    fpr, tpr, sv_threshold = roc_curve(sv_labels, sv_preds, pos_label=1)
     sv_eer = brentq(lambda x: 1.0 - x - interp1d(fpr, tpr)(x), 0.0, 1.0)
 
-    fpr, tpr, _ = roc_curve(spf_labels, spf_preds, pos_label=1)
+    fpr, tpr, spf_threshold = roc_curve(spf_labels, spf_preds, pos_label=1)
     spf_eer = brentq(lambda x: 1.0 - x - interp1d(fpr, tpr)(x), 0.0, 1.0)
 
-    return sasv_eer*100, sv_eer*100, spf_eer*100
+    return sasv_eer*100, sv_eer*100, spf_eer*100, threshold, sv_threshold,spf_threshold

@@ -3,11 +3,6 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
-@app.post("/register")
-async def register_spk():
-    return {"Hello": "World"}
-
 @app.post("/verify")
 async def verify():
     return {":"}

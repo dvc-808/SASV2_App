@@ -1,10 +1,12 @@
 #!/usr/bin/python
 #-*- coding: utf-8 -*-
 import sys
+import os
 import time
 import importlib
 import numpy as np
 import torch
+from torch.cuda.amp import *
 import torch.nn as nn
 import torch.nn.functional as F
 from DatasetLoader import test_dataset_loader
@@ -90,12 +92,7 @@ class ModelTrainer(object):
             sys.stdout.flush()
 
         return (loss/cnt, top1/cnt, lr)
-
-    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list, eval_frames=0, num_eval=1, **kwargs):
-
-        rank = 0
-        self.__model__.eval()
-
+    def enrollSpeaker(self,enroll_male_list, enroll_female_list, eval_path, eval_frames, num_eval, num_thread, **kwargs):
         ## Enroll (speaker model) loader ##
         spk_meta = {}
         meta_f = np.loadtxt(enroll_male_list, str)
@@ -121,10 +118,73 @@ class ModelTrainer(object):
             embeds_enr[spk] = ref_embeds
             # embeds_enr[spk] = torch.mean(torch.stack(ref_embeds), dim=0)
             files = []
+            sys.stdout.write("\r Enrollment bona-fide speaker model: {:s}, {:d} of {:d}      ".format(spk, idx1, len(spk_meta.keys())))
+            sys.stdout.flush()
+        return embeds_enr
+            
+    def infer(self, num_thread,infer_path,audiofilename, target_ID, eval_frames=0, num_eval=1, **kwargs):
+        
+        rank = 0
+        self.__model__.eval()
+        infer_dataset = test_dataset_loader([audiofilename], infer_path, eval_frames=eval_frames, num_eval=num_eval, **kwargs)
+        infer_loader = torch.utils.data.DataLoader(infer_dataset, batch_size=1, shuffle=False, num_workers=num_thread, drop_last=False, sampler=None)
+        for idx, data in enumerate(infer_loader):
+            #? data[x][y]
+            #? x = 0 is audio features
+            #? x = 1 is audio filename
+            #? y batch itterate since batch_size = 1 => 0 all the way
+            inp1 = data[0][0].cpu()
+            with torch.no_grad():
+                trail_embeds = self.__model__(inp1).detach()
+                #? detach() remove the ouput from the computational graph to prevent backprop
+            target_embeds = embeds_enr[target_ID]
+            #? p=2 means L2 Norm
+            #? dim=1 normalize only the rows
+            #! pay attention here boy, the Tensor shape mismatch issue might be Raised from here
+            trail_embeds = F.normalize(trail_embeds, p=2, dim=1)
+            target_embeds = F.normalize(target_embeds, p=2, dim=1)
+            score = F.cosine_similarity(target_embeds, trail_embeds)
+        return score 
+
+        ## Compute verification scores ##
+
+
+    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list, eval_frames=0, num_eval=1, **kwargs):
+
+        rank = 0
+        self.__model__.eval()
+
+        ## Enroll (speaker model) loader ##
+        spk_meta = {}
+        meta_f = np.loadtxt(enroll_male_list, str)
+        meta_m = np.loadtxt(enroll_female_list, str)
+        meta = np.concatenate((meta_f, meta_m))
+        for i, spk in enumerate(meta[:,0]):
+            spk_meta[spk] = meta[i][1].split(',')
+        
+        embeds_enr = {}
+        files = []
+        #? files: danh sach file audio enroll
+        #? spk_meta: meta cua file bonafide enroll
+        for idx1, spk in enumerate(spk_meta):
+            for file in spk_meta[spk]:
+                files += [file + '.flac']
+
+            test_dataset = test_dataset_loader(files, eval_path, eval_frames=eval_frames, num_eval=num_eval, **kwargs)
+            test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=num_thread, drop_last=False, sampler=None)
+            ref_embeds = []
+            for _, data in enumerate(test_loader):
+                inp1 = data[0][0].cuda()
+                with torch.no_grad():
+                    ref_embed = self.__model__(inp1).detach().cpu()
+                ref_embeds += [ref_embed]
+            embeds_enr[spk] = ref_embeds
+            # embeds_enr[spk] = torch.mean(torch.stack(ref_embeds), dim=0)
+            files = []
             if rank == 0:
                 sys.stdout.write("\r Enrollment bona-fide speaker model: {:s}, {:d} of {:d}      ".format(spk, idx1, len(spk_meta.keys())))
                 sys.stdout.flush()
-        print('')
+        
 
         ## Test loader ##
         tstart = time.time()
@@ -163,10 +223,15 @@ class ModelTrainer(object):
             ## Read files and compute all scores
             for idx, line in enumerate(lines_eval):
                 data = line.split()
-                #!luc nay loi phat sinh tu day ra
+                # ? data: eval_list
                 try:
+                    #? enr indexed by speaker
+                    #? tst indexed by audio files
                     enr = embeds_enr[data[0]].cuda()
                     tst = embeds_tst[data[1]].cuda()
+                    #! in the eval_list, there's some speakers that doesn't appear in the enroll list
+                    #! however, we have pretrained from Hoang Minh (hopefully) so that's not a problem
+                    #! the only issue is that, it might be a challenge to pick a appropriate threshold 
                     if self.__model__.module.__L__.test_normalize:
                         enr = F.normalize(enr, p=2, dim=1)
                         tst = F.normalize(tst, p=2, dim=1)
@@ -174,7 +239,7 @@ class ModelTrainer(object):
                     score = F.cosine_similarity(enr, tst)
 
                     all_scores.append(score.detach().cpu().numpy())
-                    all_labels.append(data[3])
+                    all_labels.append(data[3])#?target, non-target, spoof
 
                     telapsed = time.time() - tstart
 
