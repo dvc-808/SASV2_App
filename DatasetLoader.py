@@ -22,9 +22,13 @@ def loadWAV(filename, max_frames, evalmode=True, num_eval=1):
     
     # Maximum audio length
     max_audio = max_frames * 160
-    
+    audio = 0
     # Read wav file and convert to torch tensor
-    audio, sample_rate = soundfile.read(filename)
+    try:
+        audio, sample_rate = soundfile.read(filename)
+    except Exception as e:
+        print(e)
+    
     audiosize = audio.shape[0]
     if audiosize <= max_audio:
         shortage = max_audio - audiosize + 1 
