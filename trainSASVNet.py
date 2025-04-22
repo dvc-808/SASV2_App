@@ -122,7 +122,7 @@ def main_worker(args):
             np.save(f'{args.result_save_path}/predict_scores.npy', sc)
             np.save(f'{args.result_save_path}/ground_truth.npy', lab)
 
-        sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
+        sasv_eer, sv_eer, spf_eer, sasv_threshold, sv_threshold,spf_threshold = get_all_EERs(sc, lab)
         msg = f"SASV-EER {sasv_eer:2.4f}, SV-EER {sv_eer:2.4f}, SPF-EER {spf_eer:2.4f}"
         cur_time = time.strftime("%Y-%m-%d %H:%M:%S")
         print('\n', cur_time, msg)
