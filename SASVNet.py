@@ -194,7 +194,8 @@ class ModelTrainer(object):
         tstart = time.time()
         with open(eval_list) as f:
             lines_eval = f.readlines()
-        files = [x.strip().split(' ')[1] + '.flac' for x in lines_eval]
+        # files = [x.strip().split(' ')[1] + '.flac' for x in lines_eval]
+        files = [x.strip().split(' ')[1] + '.wav' for x in lines_eval]
         setfiles = list(set(files))
         setfiles.sort()
 
