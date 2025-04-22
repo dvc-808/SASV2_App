@@ -180,10 +180,10 @@ class train_dataset_loader(Dataset):
 
 class test_dataset_loader(Dataset):
     
-    def __init__(self, test_list, infer_path, eval_frames, num_eval, label=False, **kwargs):
+    def __init__(self, test_list, test_path, eval_frames, num_eval, label=False, **kwargs):
         self.max_frames = eval_frames
         self.num_eval = num_eval
-        self.infer_path = infer_path
+        self.test_path = test_path
         self.test_list = test_list
         self.test_label = label
         
