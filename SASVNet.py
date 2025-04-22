@@ -149,16 +149,20 @@ class ModelTrainer(object):
         ## Compute verification scores ##
 
 
-    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list, eval_frames=0, num_eval=1, **kwargs):
+    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list,enroll_cuong_list, eval_frames=0, num_eval=1, **kwargs):
 
         rank = 0
         self.__model__.eval()
 
         ## Enroll (speaker model) loader ##
         spk_meta = {}
-        meta_f = np.loadtxt(enroll_male_list, str)
-        meta_m = np.loadtxt(enroll_female_list, str)
-        meta = np.concatenate((meta_f, meta_m))
+        #? read from 2 enroll lists and concat (provided by this repo)
+        # meta_f = np.loadtxt(enroll_male_list, str)
+        # meta_m = np.loadtxt(enroll_female_list, str)
+        # meta = np.concatenate((meta_f, meta_m))
+
+        #? read only one enroll list
+        meta = np.loadtxt(enroll_cuong_list, str)
         for i, spk in enumerate(meta[:,0]):
             spk_meta[spk] = meta[i][1].split(',')
         

@@ -61,6 +61,7 @@ parser.add_argument('--train_list',     type=str,   default="",     help='Train 
 parser.add_argument('--eval_list',      type=str,   default="",     help='Enroll mail list')
 parser.add_argument('--enroll_female_list',  type=str,   default="",     help='Enroll Female list')
 parser.add_argument('--enroll_male_list',    type=str,   default="",     help='Enroll Male list')
+parser.add_argument('--enroll_cuong_list',    type=str,   default="",     help='Cuong Enroll list')
 parser.add_argument('--train_path',     type=str,   default="",     help='Absolute path to the train set')
 parser.add_argument('--eval_path',      type=str,   default="",     help='Absolute path to the test set')
 parser.add_argument('--spk_meta_train', type=str,   default="",     help='')
