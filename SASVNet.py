@@ -163,6 +163,7 @@ class ModelTrainer(object):
 
         #? read only one enroll list
         meta = np.loadtxt(enroll_cuong_list, str)
+        print(meta.shape())
         for i, spk in enumerate(meta[:,0]):
             spk_meta[spk] = meta[i][1].split(',')
         
