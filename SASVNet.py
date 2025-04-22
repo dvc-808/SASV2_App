@@ -163,7 +163,7 @@ class ModelTrainer(object):
 
         #? read only one enroll list
         meta = np.loadtxt(enroll_cuong_list, str)
-        print(meta.shape())
+        print(meta.shape)
         for i, spk in enumerate(meta[:,0]):
             spk_meta[spk] = meta[i][1].split(',')
         
@@ -173,7 +173,7 @@ class ModelTrainer(object):
         #? spk_meta: meta cua file bonafide enroll
         for idx1, spk in enumerate(spk_meta):
             for file in spk_meta[spk]:
-                files += [file + '.flac']
+                files += [file + '.wav']
 
             test_dataset = test_dataset_loader(files, eval_path, eval_frames=eval_frames, num_eval=num_eval, **kwargs)
             test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=num_thread, drop_last=False, sampler=None)
