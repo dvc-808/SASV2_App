@@ -172,8 +172,10 @@ class ModelTrainer(object):
         #? files: danh sach file audio enroll
         #? spk_meta: meta cua file bonafide enroll
         for idx1, spk in enumerate(spk_meta):
+            # for file in spk_meta[spk]:
+            #     files += [file + '.wav']
             for file in spk_meta[spk]:
-                files += [file + '.wav']
+                files += [file]
 
             test_dataset = test_dataset_loader(files, eval_path, eval_frames=eval_frames, num_eval=num_eval, **kwargs)
             test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=num_thread, drop_last=False, sampler=None)
