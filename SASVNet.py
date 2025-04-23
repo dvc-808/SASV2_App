@@ -9,6 +9,7 @@ import torch
 from torch.cuda.amp import *
 import torch.nn as nn
 import torch.nn.functional as F
+import wandb
 from DatasetLoader import test_dataset_loader
 from torch.cuda.amp import autocast, GradScaler
 
@@ -58,7 +59,7 @@ class ModelTrainer(object):
         self.ngpu = 1
         self.ndistfactor = int(kwargs.get('num_utt') * self.ngpu)
 
-    def train_network(self, loader, epoch):
+    def train_network(self, loader, epoch,lr,lr_t0, lr_tmul, lr_max, lr_min, lr_wstep, lr_gamma):
         self.__model__.train()
         self.__scheduler__.step(epoch-1)
         
@@ -66,7 +67,22 @@ class ModelTrainer(object):
         df = self.ndistfactor
         cnt, idx, loss, top1 = 0, 0, 0, 0
         tstart = time.time()
-        
+        run = wandb.init(
+            # Set the wandb entity where your project will be logged (generally your team name).
+            entity="dinh-viet-cuong",
+            # Set the wandb project where this run will be logged.
+            project="do-an-sasv",
+            # Track hyperparameters and run metadata.
+            config={
+                "lr":lr,
+                "lr_t0":lr_t0,
+                "lr_tmul":lr_tmul,
+                "lr_max":lr_max,
+                "lr_min":lr_min,
+                "lr_wstep":lr_wstep,
+                "lr_gamma":lr_gamma
+            },
+        )
         for data, data_label in loader:
                       
             self.__model__.zero_grad()
@@ -87,7 +103,7 @@ class ModelTrainer(object):
             lr = self.__optimizer__.param_groups[0]['lr']
             telapsed = time.time() - tstart
             tstart = time.time()
-
+            run.log({"acc": top1/cnt, "loss": loss/cnt, "learning_rate": lr})
             sys.stdout.write("\rProcessing {:d} of {:d}: Loss {:f}, ACC {:2.3f}%, LR {:.8f} - {:.2f} Hz  ".format(idx*df, loader.__len__()*bs*df, loss/cnt, top1/cnt, lr, bs*df/telapsed))
             sys.stdout.flush()
 
