@@ -261,10 +261,7 @@ class ModelTrainer(object):
                     if self.__model__.module.__L__.test_normalize:
                         enr = F.normalize(enr, p=2, dim=1)
                         tst = F.normalize(tst, p=2, dim=1)
-                    print(enr)
-                    print(tst)
                     score = F.cosine_similarity(enr, tst)
-
                     all_scores.append(score.detach().cpu().numpy())
                     all_labels.append(data[3])#?target, non-target, spoof
 
