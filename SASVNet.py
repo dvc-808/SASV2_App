@@ -205,6 +205,7 @@ class ModelTrainer(object):
             embeds_enr[spk] = ref_embeds
             # embeds_enr[spk] = torch.mean(torch.stack(ref_embeds), dim=0)
             files = []
+            
             if rank == 0:
                 sys.stdout.write("\r Enrollment bona-fide speaker model: {:s}, {:d} of {:d}      ".format(spk, idx1, len(spk_meta.keys())))
                 sys.stdout.flush()
@@ -260,7 +261,8 @@ class ModelTrainer(object):
                     if self.__model__.module.__L__.test_normalize:
                         enr = F.normalize(enr, p=2, dim=1)
                         tst = F.normalize(tst, p=2, dim=1)
-
+                    print(enr)
+                    print(tst)
                     score = F.cosine_similarity(enr, tst)
 
                     all_scores.append(score.detach().cpu().numpy())
