@@ -64,7 +64,7 @@ class ModelTrainer(object):
         self.__scheduler__.step(epoch-1)
         
         bs = loader.batch_size
-        df = self.ndistfactor
+        df = self.ndistfactor 
         cnt, idx, loss, top1 = 0, 0, 0, 0
         tstart = time.time()
         run = wandb.init(
@@ -182,6 +182,8 @@ class ModelTrainer(object):
         else:
             meta = np.loadtxt(enroll_cuong_list, str)
             meta = np.atleast_2d(meta)
+            print("cuong read")
+
         for i, spk in enumerate(meta[:,0]):
             spk_meta[spk] = meta[i][1].split(',')
         
