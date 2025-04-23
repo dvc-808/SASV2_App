@@ -92,7 +92,7 @@ class ModelTrainer(object):
             sys.stdout.flush()
 
         return (loss/cnt, top1/cnt, lr)
-    def enrollSpeaker(self,enroll_male_list, enroll_female_list, eval_path, eval_frames, num_eval, num_thread, **kwargs):
+    def enrollSpeaker(self, eval_path, eval_frames, num_eval, num_thread, **kwargs):
         ## Enroll (speaker model) loader ##
         spk_meta = {}
         meta_f = np.loadtxt(enroll_male_list, str)
@@ -157,13 +157,15 @@ class ModelTrainer(object):
         ## Enroll (speaker model) loader ##
         spk_meta = {}
         #? read from 2 enroll lists and concat (provided by this repo)
-        # meta_f = np.loadtxt(enroll_male_list, str)
-        # meta_m = np.loadtxt(enroll_female_list, str)
-        # meta = np.concatenate((meta_f, meta_m))
+        if(not enroll_cuong_list):
+            meta_f = np.loadtxt(enroll_male_list, str)
+            meta_m = np.loadtxt(enroll_female_list, str)
+            meta = np.concatenate((meta_f, meta_m))
 
         #? read only one enroll list
-        meta = np.loadtxt(enroll_cuong_list, str)
-        meta = np.atleast_2d(meta)
+        else:
+            meta = np.loadtxt(enroll_cuong_list, str)
+            meta = np.atleast_2d(meta)
         for i, spk in enumerate(meta[:,0]):
             spk_meta[spk] = meta[i][1].split(',')
         
@@ -210,7 +212,7 @@ class ModelTrainer(object):
             inp1 = data[0][0].cuda()
             with torch.no_grad():
                 ref_embed = self.__model__(inp1).detach().cpu()
-            embeds_tst[data[1][0][:-5]] = ref_embed
+            embeds_tst[data[1][0][:-4]] = ref_embed
             telapsed = time.time() - tstart
             if rank == 0:
                 sys.stdout.write("\r Reading {:d} of {:d}: {:.2f} Hz, embedding size {:d}      ".format(idx*gs, ds*gs, idx*gs/telapsed, ref_embed.size()[1]))
