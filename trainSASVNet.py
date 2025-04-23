@@ -169,13 +169,13 @@ def main_worker(args):
         if it % args.test_interval == 0:
             sc, lab = trainer.evaluateFromList(epoch=it, **vars(args))
 
-            sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
+            sasv_eer, sv_eer, spf_eer, sasv_threshold, sv_threshold,spf_threshold = get_all_EERs(sc, lab)
             SASV_EERs += [sasv_eer]
             SV_EERs += [sv_eer]
             SPF_EERs += [spf_eer]
 
             print('\n',time.strftime("%Y-%m-%d %H:%M:%S"), "Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}, BestSASV_EER {:2.4f}, BestSV_EER {:2.4f}, BestSPF_EER {:2.4f}".format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer, min(SASV_EERs), min(SV_EERs), min(SPF_EERs)))
-            scorefile.write("Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}, BestSASV_EER {:2.4f}, BestSV_EER {:2.4f}, BestSPF_EER {:2.4f}\n".
+            scorefile.write("Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n BestSASV_EER {:2.4f}, BestSV_EER {:2.4f}, BestSPF_EER {:2.4f}\n".
                             format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer, min(SASV_EERs), min(SV_EERs), min(SPF_EERs)))
             scorefile.flush()
             trainer.saveParameters(args.model_save_path+"/model%09d.model"%it)

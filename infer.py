@@ -58,6 +58,7 @@ parser.add_argument('--save_path',      type=str,   default="./exp",     help='P
 
 ## Training and test data
 parser.add_argument('--train_list',     type=str,   default="",     help='Train list')
+parser.add_argument('--audio_format',     type=str,   default="",     help='Audio Format')
 parser.add_argument('--eval_list',      type=str,   default="",     help='Enroll mail list')
 parser.add_argument('--enroll_female_list',  type=str,   default="",     help='Enroll Female list')
 parser.add_argument('--enroll_male_list',    type=str,   default="",     help='Enroll Male list')

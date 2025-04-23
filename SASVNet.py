@@ -149,7 +149,7 @@ class ModelTrainer(object):
         ## Compute verification scores ##
 
 
-    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list,enroll_cuong_list, eval_frames=0, num_eval=1, **kwargs):
+    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list,enroll_cuong_list,audio_format, eval_frames=0, num_eval=1, **kwargs):
 
         rank = 0
         self.__model__.eval()
@@ -175,7 +175,7 @@ class ModelTrainer(object):
         #? spk_meta: meta cua file bonafide enroll
         for idx1, spk in enumerate(spk_meta):
             for file in spk_meta[spk]:
-                files += [file + '.wav']
+                files += [file + audio_format]
             test_dataset = test_dataset_loader(files, eval_path, eval_frames=eval_frames, num_eval=num_eval, **kwargs)
             test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=num_thread, drop_last=False, sampler=None)
             ref_embeds = []
@@ -197,7 +197,7 @@ class ModelTrainer(object):
         with open(eval_list) as f:
             lines_eval = f.readlines()
         # files = [x.strip().split(' ')[1] + '.flac' for x in lines_eval]
-        files = [x.strip().split(' ')[1] + '.wav' for x in lines_eval]
+        files = [x.strip().split(' ')[1] + audio_format for x in lines_eval]
         setfiles = list(set(files))
         setfiles.sort()
 
