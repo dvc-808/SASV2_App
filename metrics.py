@@ -48,6 +48,9 @@ def get_all_EERs(
             )
 
     fpr, tpr, sasv_threshold = roc_curve(sasv_labels, preds, pos_label=1)
+    print(sasv_threshold)
+    print(tpr)
+    print(fpr)
     #? pos_label: positive label
     #? fpr tpr data type?
     sasv_eer = brentq(lambda x: 1.0 - x - interp1d(fpr, tpr)(x), 0.0, 1.0)
