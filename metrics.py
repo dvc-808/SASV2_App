@@ -46,10 +46,8 @@ def get_all_EERs(
             raise ValueError(
                 f"should be one of 'target', 'nontarget', 'spoof', got:{key}"
             )
-    print( "sasv_labels: "+str(len(sasv_labels)))
-    print( "sv_labels: "+str(len(sv_labels)))
-    print( "spf_labels: "+str(len(spf_labels)))
     
+    print( "labels: "+str(set(keys)))
     #? pos_label: positive label
     #? fpr tpr data type?
     fpr, tpr, sasv_threshold = roc_curve(sasv_labels, preds, pos_label=1)
