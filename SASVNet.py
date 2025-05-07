@@ -273,7 +273,7 @@ class ModelTrainer(object):
                 except Exception as e:
                     # print(e)
                     pass
-
+            print("all labels: "+str(set(all_labels)))
         return (all_scores, all_labels)
 
     def saveParameters(self, path):
