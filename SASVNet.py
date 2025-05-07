@@ -268,10 +268,11 @@ class ModelTrainer(object):
 
                     telapsed = time.time() - tstart
 
-                    sys.stdout.write("\r Computing {:d} of {:d}: {:.2f} Hz      ".format(idx, len(lines_eval), idx/telapsed))
-                    sys.stdout.flush()
+                    # sys.stdout.write("\r Computing {:d} of {:d}: {:.2f} Hz      ".format(idx, len(lines_eval), idx/telapsed))
+                    # sys.stdout.flush()
                 except Exception as e:
-                    print(e)
+                    # print(e)
+                    pass
 
         return (all_scores, all_labels)
 
