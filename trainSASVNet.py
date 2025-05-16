@@ -169,7 +169,7 @@ def main_worker(args):
         if it % args.test_interval == 0:
             sc, lab = trainer.evaluateFromList(epoch=it, **vars(args))
 
-            sasv_eer, sv_eer, spf_eer, sasv_threshold, sv_threshold,spf_threshold = get_all_EERs(sc, lab)
+            sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
             SASV_EERs += [sasv_eer]
             SV_EERs += [sv_eer]
             SPF_EERs += [spf_eer]
