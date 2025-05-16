@@ -97,7 +97,7 @@ def main_worker(args):
     it = 1
     SASV_EERs, SV_EERs, SPF_EERs = [], [], []
     ## Write args to scorefile
-    scorefile   = open(args.result_save_path+"/"+args.result_file_name+"/scores.txt", "a+")
+    scorefile   = open(args.result_save_path+"/scores.txt", "a+")
     ## Print params
     pytorch_total_params = sum(p.numel() for p in s.module.__S__.parameters())
     print('Total parameters: {:.2f}M'.format(float(pytorch_total_params)/1024/1024))
