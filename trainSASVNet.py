@@ -128,7 +128,7 @@ def main_worker(args):
         msg = f"SASV-EER {sasv_eer:2.4f}, SV-EER {sv_eer:2.4f}, SPF-EER {spf_eer:2.4f}"
         cur_time = time.strftime("%Y-%m-%d %H:%M:%S")
         print('\n', cur_time, msg)
-        with open(args.result_save_path + "/metrics", "a") as f_res:
+        with open(args.result_save_path +args.result_file_name +".txt", "a") as f_res:
             f_res.write(cur_time + "\n")
             f_res.write(msg)
         return
