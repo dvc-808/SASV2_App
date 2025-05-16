@@ -1,4 +1,4 @@
-__pycache__/
+./__pycache__/
 .idea/
 bin/
 lib/
@@ -7,4 +7,3 @@ share/
 protocols/
 Recordings/
 SystemOverview.drawio
-.env
