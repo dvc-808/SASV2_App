@@ -49,8 +49,9 @@ def get_all_EERs(
     
     print( "labels: "+str(set(keys)))
     
-    for i in spf_preds:
-        print(i)
+    for i in zip(spf_preds, spf_labels):
+        print("spf_preds: " + str(i[0]) + " spf_labels: " + str(i[1]))
+        
     #? pos_label: positive label
     #? fpr tpr data type?
     fpr, tpr, _ = roc_curve(sasv_labels, preds, pos_label=1)
