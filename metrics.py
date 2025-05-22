@@ -47,8 +47,8 @@ def get_all_EERs(
                 f"should be one of 'target', 'nontarget', 'spoof', got:{key}"
             )
     
-    for i in zip(spf_preds, spf_labels):
-        print("spf_preds: " + str(i[0]) + " spf_labels: " + str(i[1]))
+    # for i in zip(spf_preds, spf_labels):
+    #     print("spf_preds: " + str(i[0]) + " spf_labels: " + str(i[1]))
         
     #? pos_label: positive label
     #? fpr tpr data type?
