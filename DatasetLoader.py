@@ -104,7 +104,7 @@ class AugmentWAV(object):
 
 class train_dataset_loader(Dataset):
     
-    def __init__(self, train_list, augment, musan_path, rir_path, max_frames, train_path, **kwargs):
+    def __init__(self, train_list, augment, musan_path, rir_path, max_frames, train_path, audio_format, **kwargs):
         '''
             augment_wav
             train_list
@@ -141,7 +141,7 @@ class train_dataset_loader(Dataset):
         for idx, line in enumerate(lines):
             data = line.strip().split()
             filename = os.path.join(train_path, data[1])
-            self.data_list += [filename + '.flac']
+            self.data_list += [filename + audio_format]
 
             if data[4] == 'bonafide':
                 self.data_label += [dictkeys[data[0]]]
