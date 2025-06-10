@@ -55,6 +55,7 @@ parser.add_argument('--num_class',      type=int,   default=41,     help='Number
 ## Load and save
 parser.add_argument('--initial_model',  type=str,   default="",     help='Initial model weights')
 parser.add_argument('--result_save_path',      type=str,   default="./exp",     help='Path for model and logs')
+parser.add_argument('--model_save_path',      type=str,   default="./exp",     help='Path for model and logs')
 parser.add_argument('--save_path',      type=str,   default="./exp",     help='Path for model and logs')
 parser.add_argument('--result_file_name',      type=str,   default="",     help='Path for model and logs')
 
