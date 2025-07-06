@@ -182,7 +182,7 @@ def main_worker(args):
             scorefile.write("Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n BestSASV_EER {:2.4f}, BestSV_EER {:2.4f}, BestSPF_EER {:2.4f}\n".
                             format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer, min(SASV_EERs), min(SV_EERs), min(SPF_EERs)))
             scorefile.flush()
-            trainer.saveParameters(args.model_save_path+"/%s%09d.model"%(model_save_name,it)
+            trainer.saveParameters(args.model_save_path+"/%s%09d.model"%(model_save_name,it))
             print('')
 
     scorefile.close()
