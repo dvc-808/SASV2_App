@@ -6,11 +6,13 @@ import torch
 import random
 import itertools
 import soundfile
+import librosa
 import numpy as np
 # import torch.distributed as dist
 from scipy import signal
 from torch.utils.data import Dataset
 from utils import Resample
+
 
 def round_down(num, divisor):
     return num - (num%divisor)
@@ -25,12 +27,17 @@ def loadWAV(filename, max_frames, evalmode=True, num_eval=1):
     audio = 0
     # Read wav file and convert to torch tensor
     try:
-        audio, sample_rate = soundfile.read(filename)
-
+        # audio, sample_rate = soundfile.read(filename)
+        audio, sample_rate=librosa.load(filename, sr=None, backend= "audioread")
     except Exception as e:
+        print(audio.shape)
         print(f'LoadError: Unable to load {filename} due to: \n{e}')
-    
-    audiosize = audio.shape[0]
+    try:
+        audiosize = audio.shape[0]
+    except Exception as e:
+        print(audio.shape)
+        print(f'SizeError: Unable to read {filename} due to: \n{e}')
+
     if audiosize <= max_audio:
         shortage = max_audio - audiosize + 1 
         audio = np.pad(audio, (0, shortage), 'wrap')
