@@ -26,11 +26,9 @@ def loadWAV(filename, max_frames, evalmode=True, num_eval=1):
     # Read wav file and convert to torch tensor
     try:
         audio, sample_rate = soundfile.read(filename)
-        print(audio)
-        print(audio.shape)
 
     except Exception as e:
-        print(e)
+        print(f'LoadError: Unable to load {filename} due to: \n{e}')
     
     audiosize = audio.shape[0]
     if audiosize <= max_audio:
