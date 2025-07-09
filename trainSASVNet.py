@@ -73,6 +73,7 @@ parser.add_argument('--spk_meta_eval',  type=str,   default="",     help='')
 parser.add_argument('--musan_path',     type=str,   default="",     help='Absolute path to the test set')
 parser.add_argument('--rir_path',       type=str,   default="",     help='Absolute path to the test set')
 parser.add_argument('--audio_format',      type=str,   default="",     help='audioformat')
+parser.add_argument('--train_audio_format',      type=str,   default="",     help='audioformat')
 
 ## Model definition
 parser.add_argument('--num_mels',       type=int,   default=80,     help='Number of mel filterbanks')

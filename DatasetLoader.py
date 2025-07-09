@@ -104,7 +104,7 @@ class AugmentWAV(object):
 
 class train_dataset_loader(Dataset):
     
-    def __init__(self, train_list, augment, musan_path, rir_path, max_frames, train_path, audio_format, **kwargs):
+    def __init__(self, train_list, augment, musan_path, rir_path, max_frames, train_path, train_audio_format, **kwargs):
         '''
             augment_wav
             train_list
@@ -141,7 +141,7 @@ class train_dataset_loader(Dataset):
         for idx, line in enumerate(lines):
             data = line.strip().split()
             filename = os.path.join(train_path, data[1])
-            self.data_list += [filename + audio_format]
+            self.data_list += [filename + train_audio_format]
 
             if data[4] == 'bonafide':
                 self.data_label += [dictkeys[data[0]]]
@@ -203,7 +203,6 @@ class test_dataset_loader(Dataset):
         return len(self.test_list)
 
 class train_dataset_sampler(torch.utils.data.Sampler):
-    
     def __init__(self, data_source, num_utt, max_seg_per_spk, num_spk, batch_size, seed, **kwargs):       
         self.data_group = data_source.data_group
         self.num_utt = num_utt
