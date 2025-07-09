@@ -28,7 +28,7 @@ def loadWAV(filename, max_frames, evalmode=True, num_eval=1):
     # Read wav file and convert to torch tensor
     try:
         # audio, sample_rate = soundfile.read(filename)
-        audio, sample_rate=librosa.load(filename, sr=None, backend= "audioread")
+        audio, sample_rate=librosa.load(filename, sr=None)
     except Exception as e:
         print(audio.shape)
         print(f'LoadError: Unable to load {filename} due to: \n{e}')
