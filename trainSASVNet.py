@@ -183,7 +183,7 @@ def main_worker(args):
         train_sampler.set_epoch(it)
         loss, traineer, lr = trainer.train_network(train_loader, it)
 
-        run.log({"acc": traineer, "loss": loss, "lr": lr})
+        run.log({"epoch": it, "acc": traineer, "loss": loss, "lr": lr})
         
         ## Evaluating
         if it % args.test_interval == 0:
