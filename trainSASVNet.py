@@ -9,6 +9,7 @@ import zipfile
 import warnings
 import argparse
 import datetime
+import wandb
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from metrics import *
@@ -162,13 +163,27 @@ def main_worker(args):
     zipf.close()
     with open(args.result_save_path + '/run%s.cmd'%strtime, 'w') as f:
         f.write('%s'%args)
-
+    ##initialize wandb
+    run = wandb.init(
+        # Set the wandb entity where your project will be logged (generally your team name).
+        entity="dinh-viet-cuong",
+        # Set the wandb project where this run will be logged.
+        project="do-an-sasv",
+        # Track hyperparameters and run metadata.
+        config={
+            "architecture": "MFA Conformer",
+            "dataset": "VSASV",
+            "epochs": 50,
+        },
+    )
     ## Core training script
     for it in range(it,args.max_epoch+1):
 
         ## Training
         train_sampler.set_epoch(it)
         loss, traineer, lr = trainer.train_network(train_loader, it)
+
+        run.log({"acc": traineer, "loss": loss, "lr": lr})
         
         ## Evaluating
         if it % args.test_interval == 0:
@@ -183,6 +198,7 @@ def main_worker(args):
             scorefile.write("Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n BestSASV_EER {:2.4f}, BestSV_EER {:2.4f}, BestSPF_EER {:2.4f}\n".
                             format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer, min(SASV_EERs), min(SV_EERs), min(SPF_EERs)))
             scorefile.flush()
+            run.log({"epoch": it, "sasv_eer":sasv_eer, "sv_eer":sv_eer, "spf_eer":spf_eer})
             trainer.saveParameters(args.model_save_path+"/%s%09d.model"%(args.model_save_name,it))
             print('')
 
