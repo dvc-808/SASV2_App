@@ -77,6 +77,7 @@ parser.add_argument('--spk_meta_eval',  type=str,   default="",     help='')
 parser.add_argument('--audio_format',      type=str,   default="",     help='audioformat')
 parser.add_argument('--eval_list',      type=str,   default="",     help='Enroll mail list')
 parser.add_argument('--eval_path',      type=str,   default="",     help='Absolute path to the test set')
+
 parser.add_argument('--enroll_single_list_multiple',nargs='+',    type=str,   default="",     help='Cuong Enroll list')
 parser.add_argument('--eval_list_multiple',         nargs='+',    type=str,   default="",     help='Enroll mail list')
 parser.add_argument('--eval_path_multiple',         nargs='+',    type=str,   default="",     help='Absolute path to the test set')
@@ -134,6 +135,8 @@ def main_worker(args):
                                 args.eval_list_multiple,
                                 args.eval_path_multiple,
                                 args.eval_name_multiple):
+                print (f"{en} \n {ev} \n {au} \n {name} \n")
+
                 sc, lab = trainer.evaluateFromList(epoch=it, 
                                                     eval_list=ev,
                                                     enroll_single_list=en,
