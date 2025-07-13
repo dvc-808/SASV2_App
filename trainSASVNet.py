@@ -144,8 +144,8 @@ def main_worker(args):
                     **filtered_args
                 )
                 sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
-                print('\n', f"Test case{name}, SASV_EER {sasv_eer:2.4f}, SV_EER {sv_eer:2.4f}, SPF_EER {spf_eer:2.4f}\n")
-                return
+                print('\n', f"Test case: {name}, SASV_EER {sasv_eer:2.4f}, SV_EER {sv_eer:2.4f}, SPF_EER {spf_eer:2.4f}\n")
+            return
         
         print('Test list',args.eval_list)
         sc, lab = trainer.evaluateFromList(**vars(args))
@@ -226,7 +226,7 @@ def main_worker(args):
                         **filtered_args
                     )
                     sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
-                    print('\n', "Test case{:s}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n".format(name, sasv_eer, sv_eer, spf_eer))
+                    print('\n', "Test case: {:s}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n".format(name, sasv_eer, sv_eer, spf_eer))
                     run.log({"epoch": it, 
                              f"{name}_sasv_eer": sasv_eer, 
                              f"{name}_sv_eer": sv_eer, 
