@@ -131,19 +131,20 @@ def main_worker(args):
     ## Evaluation only
     if args.eval == True:
         if args.eval_multiple:
-            for en,ev,au,name in  zip(args.enroll_single_list_multiple,
-                                args.eval_list_multiple,
-                                args.eval_path_multiple,
-                                args.eval_name_multiple):
-                print (f"{en} \n {ev} \n {au} \n {name} \n")
-
-                sc, lab = trainer.evaluateFromList(epoch=it, 
-                                                    eval_list=ev,
-                                                    enroll_single_list=en,
-                                                    eval_path=au,
-                                                    **vars(args))
+            for en,ev,au,name in zip(args.enroll_single_list_multiple,
+                                 args.eval_list_multiple,
+                                 args.eval_path_multiple,
+                                 args.eval_name_multiple):
+                filtered_args = {k: v for k, v in vars(args).items() if k not in ['enroll_single_list', 'eval_list', 'eval_path']}
+                sc, lab = trainer.evaluateFromList(
+                    epoch=it,
+                    eval_list=ev,
+                    enroll_single_list=en,
+                    eval_path=au,
+                    **filtered_args
+                )
                 sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
-                print('\n', "Test case{:s}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n".format(name, sasv_eer, sv_eer, spf_eer))
+                print('\n', f"Test case{name}, SASV_EER {sasv_eer:2.4f}, SV_EER {sv_eer:2.4f}, SPF_EER {spf_eer:2.4f}\n")
                 return
         
         print('Test list',args.eval_list)
@@ -216,11 +217,14 @@ def main_worker(args):
                                     args.eval_list_multiple,
                                     args.eval_path_multiple,
                                     args.eval_name_multiple):
-                    sc, lab = trainer.evaluateFromList(epoch=it, 
-                                                       eval_list=ev,
-                                                       enroll_single_list=en,
-                                                       eval_path=au,
-                                                       **vars(args))
+                    filtered_args = {k: v for k, v in vars(args).items() if k not in ['enroll_single_list', 'eval_list', 'eval_path']}
+                    sc, lab = trainer.evaluateFromList(
+                        epoch=it,
+                        eval_list=ev,
+                        enroll_single_list=en,
+                        eval_path=au,
+                        **filtered_args
+                    )
                     sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
                     print('\n', "Test case{:s}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n".format(name, sasv_eer, sv_eer, spf_eer))
                     run.log({"epoch": it, 
