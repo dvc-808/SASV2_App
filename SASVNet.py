@@ -61,7 +61,7 @@ class ModelTrainer(object):
 
     # def train_network(self, loader, epoch,lr,lr_t0, lr_tmul, lr_max, lr_min, lr_wstep, lr_gamma):
     def train_network(self, loader, epoch):
-        
+        #initialize weight and bias
         self.__model__.train()
         self.__scheduler__.step(epoch-1)
         
@@ -95,7 +95,7 @@ class ModelTrainer(object):
 
         return (loss/cnt, top1/cnt, lr)
 
-    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list,enroll_cuong_list,audio_format, eval_frames=0, num_eval=1, **kwargs):
+    def evaluateFromList(self, eval_list, eval_path, num_thread,enroll_female_list, enroll_male_list,enroll_single_list,audio_format, eval_frames=0, num_eval=1, **kwargs):
 
         rank = 0
         self.__model__.eval()
@@ -103,14 +103,14 @@ class ModelTrainer(object):
         ## Enroll (speaker model) loader ##
         spk_meta = {}
         #? read from 2 enroll lists and concat (provided by this repo)
-        if(not enroll_cuong_list):
+        if(not enroll_single_list):
             meta_f = np.loadtxt(enroll_male_list, str)
             meta_m = np.loadtxt(enroll_female_list, str)
             meta = np.concatenate((meta_f, meta_m))
 
         #? read only one enroll list
         else:
-            meta = np.loadtxt(enroll_cuong_list, str)
+            meta = np.loadtxt(enroll_single_list, str)
             meta = np.atleast_2d(meta)
             print("cuong read")
 

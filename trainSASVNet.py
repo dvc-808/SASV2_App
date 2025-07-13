@@ -61,20 +61,27 @@ parser.add_argument('--save_path',      type=str,   default="./exp",     help='P
 parser.add_argument('--result_file_name',      type=str,   default="",     help='Path for model and logs')
 parser.add_argument('--model_save_name',      type=str,   default="",     help='model name')
 
-## Training and test data
+## Training data
 parser.add_argument('--train_list',     type=str,   default="",     help='Train list')
-parser.add_argument('--eval_list',      type=str,   default="",     help='Enroll mail list')
-parser.add_argument('--enroll_female_list',  type=str,   default="",     help='Enroll Female list')
-parser.add_argument('--enroll_male_list',    type=str,   default="",     help='Enroll Male list')
-parser.add_argument('--enroll_cuong_list',    type=str,   default="",     help='Cuong Enroll list')
 parser.add_argument('--train_path',     type=str,   default="",     help='Absolute path to the train set')
-parser.add_argument('--eval_path',      type=str,   default="",     help='Absolute path to the test set')
-parser.add_argument('--spk_meta_train', type=str,   default="",     help='')
-parser.add_argument('--spk_meta_eval',  type=str,   default="",     help='')
+parser.add_argument('--train_audio_format',      type=str,   default="",     help='audioformat')
 parser.add_argument('--musan_path',     type=str,   default="",     help='Absolute path to the test set')
 parser.add_argument('--rir_path',       type=str,   default="",     help='Absolute path to the test set')
+
+#Test data
+parser.add_argument('--enroll_female_list',  type=str,   default="",     help='Enroll Female list')
+parser.add_argument('--enroll_male_list',    type=str,   default="",     help='Enroll Male list')
+parser.add_argument('--enroll_single_list',    type=str,   default="",     help='Cuong Enroll list')
+parser.add_argument('--spk_meta_train', type=str,   default="",     help='')
+parser.add_argument('--spk_meta_eval',  type=str,   default="",     help='')
 parser.add_argument('--audio_format',      type=str,   default="",     help='audioformat')
-parser.add_argument('--train_audio_format',      type=str,   default="",     help='audioformat')
+parser.add_argument('--eval_list',      type=str,   default="",     help='Enroll mail list')
+parser.add_argument('--eval_path',      type=str,   default="",     help='Absolute path to the test set')
+parser.add_argument('--enroll_single_list_multiple',nargs='+',    type=str,   default="",     help='Cuong Enroll list')
+parser.add_argument('--eval_list_multiple',         nargs='+',    type=str,   default="",     help='Enroll mail list')
+parser.add_argument('--eval_path_multiple',         nargs='+',    type=str,   default="",     help='Absolute path to the test set')
+parser.add_argument('--eval_name_multiple',         nargs='+',    type=str,   default="",     help='Absolute path to the test set')
+
 
 ## Model definition
 parser.add_argument('--num_mels',       type=int,   default=80,     help='Number of mel filterbanks')
@@ -87,6 +94,7 @@ parser.add_argument('--eca_s',          type=int,   default=8,      help='ECAPA-
 
 ## Evaluation types
 parser.add_argument('--eval',           dest='eval', action='store_true', help='Eval only')
+parser.add_argument('--eval_multiple',  dest='eval_multiple', action='store_true', help='Eval both')
 parser.add_argument('--scoring',        dest='scoring', action='store_true', help='Scoring')
 
 args = parser.parse_args()
@@ -99,7 +107,7 @@ def main_worker(args):
     s = WrappedModel(s).cuda()
 
     it = 1
-    SASV_EERs, SV_EERs, SPF_EERs = [], [], []
+    # SASV_EERs, SV_EERs, SPF_EERs = [], [], []
     ## Write args to scorefile
     scorefile   = open(args.save_path+"/scores.txt", "a+")
     ## Print params
@@ -121,6 +129,20 @@ def main_worker(args):
         it = int(os.path.splitext(os.path.basename(modelfiles[-1]))[0][5:]) + 1
     ## Evaluation only
     if args.eval == True:
+        if args.eval_multiple:
+            for en,ev,au,name in  zip(args.enroll_single_list_multiple,
+                                args.eval_list_multiple,
+                                args.eval_path_multiple,
+                                args.eval_name_multiple):
+                sc, lab = trainer.evaluateFromList(epoch=it, 
+                                                    eval_list=ev,
+                                                    enroll_single_list=en,
+                                                    eval_path=au,
+                                                    **vars(args))
+                sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
+                print('\n', "Test case{:s}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n".format(name, sasv_eer, sv_eer, spf_eer))
+                return
+        
         print('Test list',args.eval_list)
         sc, lab = trainer.evaluateFromList(**vars(args))
         
@@ -182,25 +204,46 @@ def main_worker(args):
         ## Training
         train_sampler.set_epoch(it)
         loss, traineer, lr = trainer.train_network(train_loader, it)
-
         run.log({"epoch": it, "acc": traineer, "loss": loss, "lr": lr})
-        
         ## Evaluating
         if it % args.test_interval == 0:
-            sc, lab = trainer.evaluateFromList(epoch=it, **vars(args))
+            if args.eval_multiple:
+                print('\n',time.strftime("%Y-%m-%d %H:%M:%S"), "Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}".format(it, traineer, loss, lr))
+                for en,ev,au,name in  zip(args.enroll_single_list_multiple,
+                                    args.eval_list_multiple,
+                                    args.eval_path_multiple,
+                                    args.eval_name_multiple):
+                    sc, lab = trainer.evaluateFromList(epoch=it, 
+                                                       eval_list=ev,
+                                                       enroll_single_list=en,
+                                                       eval_path=au,
+                                                       **vars(args))
+                    sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
+                    print('\n', "Test case{:s}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n".format(name, sasv_eer, sv_eer, spf_eer))
+                    run.log({"epoch": it, 
+                             f"{name}_sasv_eer": sasv_eer, 
+                             f"{name}_sv_eer": sv_eer, 
+                             f"{name}_spf_eer": spf_eer})
+                    
+                # scorefile.write("Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n ".
+                #                 format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer))
+                # scorefile.flush()
+                trainer.saveParameters(args.model_save_path+"/%s%09d.model"%(args.model_save_name,it))
+                print('')
 
-            sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
-            SASV_EERs += [sasv_eer]
-            SV_EERs += [sv_eer]
-            SPF_EERs += [spf_eer]
 
-            print('\n',time.strftime("%Y-%m-%d %H:%M:%S"), "Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}, BestSASV_EER {:2.4f}, BestSV_EER {:2.4f}, BestSPF_EER {:2.4f}".format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer, min(SASV_EERs), min(SV_EERs), min(SPF_EERs)))
-            scorefile.write("Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n BestSASV_EER {:2.4f}, BestSV_EER {:2.4f}, BestSPF_EER {:2.4f}\n".
-                            format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer, min(SASV_EERs), min(SV_EERs), min(SPF_EERs)))
-            scorefile.flush()
-            run.log({"epoch": it, "sasv_eer":sasv_eer, "sv_eer":sv_eer, "spf_eer":spf_eer})
-            trainer.saveParameters(args.model_save_path+"/%s%09d.model"%(args.model_save_name,it))
-            print('')
+
+            else:
+                sc, lab = trainer.evaluateFromList(epoch=it, **vars(args))
+                sasv_eer, sv_eer, spf_eer = get_all_EERs(sc, lab)
+                print('\n',time.strftime("%Y-%m-%d %H:%M:%S"), "Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}"
+                    .format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer))
+                scorefile.write("Epoch {:d}, ACC {:2.2f}, TLOSS {:f}, LR {:2.8f}, SASV_EER {:2.4f}, SV_EER {:2.4f}, SPF_EER {:2.4f}\n ".
+                                format(it, traineer, loss, lr, sasv_eer, sv_eer, spf_eer))
+                scorefile.flush()
+                trainer.saveParameters(args.model_save_path+"/%s%09d.model"%(args.model_save_name,it))
+                print('')
+    wandb.finish()
 
     scorefile.close()
 
