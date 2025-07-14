@@ -69,8 +69,9 @@ class ModelTrainer(object):
         df = self.ndistfactor 
         cnt, idx, loss, top1 = 0, 0, 0, 0
         tstart = time.time()
+        
         for data, data_label in loader:
-                      
+            
             self.__model__.zero_grad()
             data = data.transpose(1,0)
             label = torch.LongTensor(data_label).cuda()

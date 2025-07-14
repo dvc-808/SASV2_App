@@ -133,7 +133,7 @@ class train_dataset_loader(Dataset):
         # Read training files
         with open(train_list) as dataset_file:
             lines = dataset_file.readlines()
-
+        print(f"Train list have {len(lines)} entries")
         # Make a dictionary of ID names and ID indices
         dictkeys = list(set([x.split()[0] for x in lines]))
         dictkeys += ['spoof']
