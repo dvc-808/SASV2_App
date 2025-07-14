@@ -61,3 +61,4 @@ def get_all_EERs(
 
 
     return sasv_eer*100, sv_eer*100, spf_eer*100
+

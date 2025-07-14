@@ -7,6 +7,7 @@ from utils import PreEmphasis
 from .specaugment import SpecAugment
 from .wenet.transformer.encoder_cat import ConformerEncoder
 
+
 class Conformer(nn.Module):
     def __init__(self, num_mels=80, num_blocks=6, output_size=256, embedding_dim=192, input_layer="conv2d2", pos_enc_layer_type="rel_pos"):
         super(Conformer, self).__init__()
@@ -15,7 +16,6 @@ class Conformer(nn.Module):
         self.conformer = ConformerEncoder(input_size=num_mels, num_blocks=num_blocks, output_size=output_size, input_layer=input_layer, pos_enc_layer_type=pos_enc_layer_type, )
         self.bn = nn.BatchNorm1d(output_size*num_blocks*2)
         self.fc = nn.Linear(output_size*num_blocks*2, embedding_dim)
-
         self.specaug = SpecAugment()
         self.torchfbank = torch.nn.Sequential(
             PreEmphasis(),

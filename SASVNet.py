@@ -112,7 +112,6 @@ class ModelTrainer(object):
         else:
             meta = np.loadtxt(enroll_single_list, str)
             meta = np.atleast_2d(meta)
-            print("cuong read")
 
         for i, spk in enumerate(meta[:,0]):
             spk_meta[spk] = meta[i][1].split(',')
@@ -203,7 +202,7 @@ class ModelTrainer(object):
                 except Exception as e:
                     # print(e)
                     pass
-            print("all labels: "+str(set(all_labels)))
+            # print("all labels: "+str(set(all_labels)))
         return (all_scores, all_labels)
 
     def saveParameters(self, path):
