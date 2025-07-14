@@ -69,7 +69,6 @@ class ModelTrainer(object):
         df = self.ndistfactor 
         cnt, idx, loss, top1 = 0, 0, 0, 0
         tstart = time.time()
-        print(f"Train loader length: {len(loader)}")
         print(f"Train dataset length: {len(loader.dataset)}")
         for data, data_label in loader:
             
