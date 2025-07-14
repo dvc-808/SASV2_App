@@ -202,6 +202,7 @@ def main_worker(args):
             "epochs": 50,
         },
     )
+    print(f"loader len {len(train_loader)}")
     ## Core training script
     for it in range(it,args.max_epoch+1):
 
